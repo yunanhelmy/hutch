@@ -18,7 +18,7 @@ module Hutch
 
       SdNotify.ready
 
-      daemonise_process
+      # daemonise_process
 
       write_pid if Hutch::Config.pidfile
 
