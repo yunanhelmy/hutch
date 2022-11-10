@@ -5,6 +5,8 @@ require 'hutch/config'
 require 'hutch/version'
 require 'hutch/exceptions'
 
+require 'sd_notify'
+
 module Hutch
   class CLI
     include Logging
@@ -13,6 +15,8 @@ module Hutch
     def run(argv = ARGV)
       Hutch::Config.initialize
       parse_options(argv)
+
+      SdNotify.ready
 
       daemonise_process
 
@@ -23,9 +27,11 @@ module Hutch
       if load_app && start_work_loop == :success
         # If we got here, the worker was shut down nicely
         Hutch.logger.info 'hutch shut down gracefully'
+        SdNotify.stopping
         exit 0
       else
         Hutch.logger.info 'hutch terminated due to an error'
+        SdNotify.stopping
         exit 1
       end
     end
